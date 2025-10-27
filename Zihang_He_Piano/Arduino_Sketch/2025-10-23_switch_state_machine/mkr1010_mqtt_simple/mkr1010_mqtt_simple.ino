@@ -72,13 +72,12 @@ void buzzerTask() {
 namespace JHD1313M1 {
   const uint8_t I2C_ADDR_TEXT = 0x3E; // 文本控制器
   const uint8_t I2C_ADDR_RGB  = 0x62; // 背光控制器
-  // 写命令/数据
   void writeCmd(uint8_t c)   { Wire.beginTransmission(I2C_ADDR_TEXT); Wire.write(0x80); Wire.write(c); Wire.endTransmission(); }
   void writeData(uint8_t d)  { Wire.beginTransmission(I2C_ADDR_TEXT); Wire.write(0x40); Wire.write(d); Wire.endTransmission(); }
   void setRGB(uint8_t r, uint8_t g, uint8_t b) {
-    Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x00); Wire.write(0x00); Wire.endTransmission(); // MODE1
-    Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x01); Wire.write(0x00); Wire.endTransmission(); // MODE2
-    Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x08); Wire.write(0xAA); Wire.endTransmission(); // OUTDRV
+    Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x00); Wire.write(0x00); Wire.endTransmission();
+    Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x01); Wire.write(0x00); Wire.endTransmission();
+    Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x08); Wire.write(0xAA); Wire.endTransmission();
     Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x04); Wire.write(r); Wire.endTransmission();
     Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x03); Wire.write(g); Wire.endTransmission();
     Wire.beginTransmission(I2C_ADDR_RGB); Wire.write(0x02); Wire.write(b); Wire.endTransmission();
@@ -86,18 +85,10 @@ namespace JHD1313M1 {
   void init() {
     Wire.begin();
     delay(50);
-    writeCmd(0x38); // 8-bit, 2 line, normal font
-    writeCmd(0x39); // instruction set
-    writeCmd(0x14); // bias/osc
-    writeCmd(0x70); // contrast set
-    writeCmd(0x56); // power/icon/contrast
-    writeCmd(0x6C); // follower control
-    delay(200);
-    writeCmd(0x38); // function set
-    writeCmd(0x0C); // display ON, cursor off, blink off
-    writeCmd(0x01); // clear
-    delay(2);
-    setRGB(0, 128, 255); // 初始背光
+    writeCmd(0x38); writeCmd(0x39); writeCmd(0x14); writeCmd(0x70);
+    writeCmd(0x56); writeCmd(0x6C); delay(200);
+    writeCmd(0x38); writeCmd(0x0C); writeCmd(0x01); delay(2);
+    setRGB(0, 128, 255);
   }
   void clear() { writeCmd(0x01); delay(2); }
   void setCursor(uint8_t col, uint8_t row) {
@@ -108,10 +99,7 @@ namespace JHD1313M1 {
     setCursor(0, row);
     for (uint8_t i = 0; i < 16; ++i) {
       char c = text[i];
-      if (!c) { // 填空格清尾
-        for (; i < 16; ++i) writeData(' ');
-        break;
-      }
+      if (!c) { for (; i < 16; ++i) writeData(' '); break; }
       writeData(c);
     }
   }
@@ -162,6 +150,28 @@ void set_only_block_rgb(uint8_t groupIdx, uint8_t r, uint8_t g, uint8_t b) {
   mqttClient.publish(mqtt_topic.c_str(), RGBpayload, payload_size);
 }
 
+// ===== 新增：整条同色 =====
+void set_all_rgb(uint8_t r, uint8_t g, uint8_t b) {
+  if (!mqttClient.connected()) return;
+  for (int p = 0; p < num_leds; ++p) {
+    RGBpayload[p*3+0] = r;
+    RGBpayload[p*3+1] = g;
+    RGBpayload[p*3+2] = b;
+  }
+  mqttClient.publish(mqtt_topic.c_str(), RGBpayload, payload_size);
+}
+
+// ===== 模式开关（D10；I=LOW 自动，O=HIGH 按键）=====
+const uint8_t modeSwitchPin = 10;       // 一脚接 GND，一脚接 D10
+int lastModeLevel = HIGH;               // 上次读值
+unsigned long lastModeDebounce = 0;
+const unsigned long MODE_DEBOUNCE_MS = 25;
+
+// 自动模式计时
+unsigned long lastAutoMs = 0;
+const unsigned long AUTO_INTERVAL_MS = 1000;
+int autoHue = 0;
+
 // ---------- setup / loop ----------
 void setup() {
   Serial.begin(115200);
@@ -175,6 +185,10 @@ void setup() {
     lastLevel[i] = digitalRead(buttonPins[i]);
   }
   pinMode(buzzerPin, OUTPUT);
+
+  // 模式开关
+  pinMode(modeSwitchPin, INPUT_PULLUP);
+  lastModeLevel = digitalRead(modeSwitchPin);
 
   JHD1313M1::init();
   JHD1313M1::printLine(0, "Ready          ");
@@ -196,7 +210,21 @@ void loop() {
 
   unsigned long now = millis();
 
-  // 扫描 8 个键：按下边沿 -> 蜂鸣 + LCD + 灯
+  // ==== 读取并消抖模式开关 ====
+  int modeLevel = digitalRead(modeSwitchPin);
+  if (modeLevel != lastModeLevel && (now - lastModeDebounce) > MODE_DEBOUNCE_MS) {
+    lastModeDebounce = now;
+    lastModeLevel = modeLevel;
+
+    // 切模式时，重置一下自动计时 / 或清灯
+    if (modeLevel == LOW) {           // I = 自动
+      lastAutoMs = 0;                 // 立即执行一次自动变色
+    } else {                          // O = 按键
+      send_all_off();                 // 回到按键模式先清一遍
+    }
+  }
+
+  // ==== 扫描 8 个键：蜂鸣器 + LCD 始终工作 ====
   for (uint8_t i = 0; i < 8; ++i) {
     int level = digitalRead(buttonPins[i]);
     if (level != lastLevel[i] && (now - lastDebounceMs[i]) > DEBOUNCE_MS) {
@@ -206,23 +234,38 @@ void loop() {
         // 1) 蜂鸣
         buzzerStart(notesHz[i], 120);
 
-        // 2) LCD 显示音名，并把背光调成当前灯色的近似色
+        // 2) LCD 音名 & 背光
         char line[17];
         snprintf(line, sizeof(line), "Note: %-3s     ", noteNames[i]);
         JHD1313M1::printLine(0, line);
 
-        // 3) 计算灯色 & 发布，仅点亮该组的 9 颗
         uint8_t r,g,b;
         hsvToRgb((float)hues[i], SAT, VAL, r, g, b);
-        set_only_block_rgb(i, r, g, b);
-
-        // 把背光也换个接近的颜色（弱化一点避免刺眼）
         JHD1313M1::setRGB(r/2, g/2, b/2);
 
-        hues[i] = (hues[i] + HUE_STEP) % 360; // 为该组推进到下一个色相
+        // 3) 只有在 O（按键模式）时，才让灯带跟随按键变色
+        if (digitalRead(modeSwitchPin) == HIGH) { // O 模式
+          set_only_block_rgb(i, r, g, b);
+          hues[i] = (hues[i] + HUE_STEP) % 360;
+        }
       }
 
       lastLevel[i] = level;
+    }
+  }
+
+  // ==== I（自动）模式：整条灯每秒切色 ====
+  if (digitalRead(modeSwitchPin) == LOW) { // I 模式
+    if (lastAutoMs == 0 || (now - lastAutoMs) >= AUTO_INTERVAL_MS) {
+      lastAutoMs = now;
+      uint8_t r,g,b;
+      hsvToRgb((float)autoHue, SAT, VAL, r, g, b);
+      set_all_rgb(r, g, b);
+
+      // 背光也同步变一点（不影响你的LCD文字逻辑）
+      JHD1313M1::setRGB(r/2, g/2, b/2);
+
+      autoHue = (autoHue + 30) % 360;
     }
   }
 
