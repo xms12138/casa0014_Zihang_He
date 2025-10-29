@@ -1,11 +1,38 @@
 # CASA0014: CONNECTED ENVIRONMENTS
 
-## Summary
+### by Zihang He
 
-An introduction to building the internet of things for people and the environment. In this module students will be introduced to concepts and technologies underpinning connected environments and the role technology can play in trying to measure and understand the built and natural world. Through a series of practical workshop sessions students will be introduced to IoT prototyping tools, existing sensor systems in UCL East and the Queen Elizabeth Olympic Park and will build a simple sensor system to explore end to end IoT systems.
+## Overview
 
-## Keywords
-Internet of Things, Connected Environments, Prototypying, Living Labs
+This repository is a **fork** of the original [ucl-casa-ce/casa0014](https://github.com/ucl-casa-ce/casa0014) repository for the UCL module **CASA0014 – Connected Environments**.
+
+For the introduction of my personal piano-making project, please refer to here: aaa
+
+
+
+## Purpose of This Fork
+
+I forked the original repository to host my personal coursework for **CASA0014** and to extend the practical IoT components beyond the base examples. All of my contents are on "[Zihang_He_Piano]" this folder.
+ Specifically, this fork includes my individual project:
+
+> **Piano + Metronome MQTT LED Control System**
+>  A custom IoT prototype combining musical input, metronome control, and MQTT-based LED visualization.
+
+
+
+## Key Additions & Modifications
+
+- Added a new folder **`Zihang_He_Piano/`** containing:
+  - Arduino sketches for piano-key and metronome integration.
+  - Hardware documentation (`/hardware_components/`) describing sensors, wiring, and device behavior.
+- Updated hardware configuration to include:
+  - 8 mechanical piano switches.
+  - Grove LCD RGB Backlight display for real-time note and BPM readout.
+  - Slider potentiometer for BPM adjustment.
+  - State-machine switch for toggling between *Performance* and *Metronome* modes.
+  - Passive buzzer for rhythmic feedback.
+
+
 
 ## What is in the CASA0014 GitHub repository?
 
@@ -46,13 +73,13 @@ Collaboration
 
 In addition, you will establish a shared ‘connected environment’ that you will curate throughout the programme.
 
-  
+
 ## Software
 
 The course will make heavy use of the following software packages
 
 - **Arduino** Download and install the [Arduino IDE](https://www.arduino.cc/en/main/software) Click the `JUST DOWNLOAD` link to the left of the `CONTRIBUTE & DOWNLOAD` button. Once downloaded follow the instructions to install.
-    
+  
 - **GitHub** Create an account on [GitHub](https://github.com) if you don't already have one.
 
 - **Git client.** If you are comfortable using Git on the command line then go for it. If you prefer a GUI representation then download a git client to make your life easier. 
