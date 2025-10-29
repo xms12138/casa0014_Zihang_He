@@ -34,60 +34,26 @@ I forked the original repository to host my personal coursework for **CASA0014**
 
 
 
-## What is in the CASA0014 GitHub repository?
-
-This repo is being used to share materials used in the workshop component of the module. Some overview information is below but the key items are:
+## Why I Only Keep the “vespera” Folder from the Original Repo
 
 - links to [Vespera project folder](vespera)
 
-- workshop - [Web LED](/webled/)
+The **`vespera/`** directory was preserved because it contains:
 
-...
+- Essential **course code** and **reference examples** required for CASA0014 assignments.
+- Navigation files that link to the UCL course materials and workshop projects.
 
-But for posterity we have also kept the old workshops for extra curricula activity!
-
-- pre 2024 workshop - [blinking monster](/2023blinkingMonster/)
-
-- pre 2024 workshop - [plant monitor](/2023plantMonitor/)
-
-- 2024 workshop - [Chrono Lumina](/2024chronoLumina/)
-
-## Module Aims and Objectives
-
-After having taking this module, you will develop skills in three key areas and should be able to:
-
-Domain Knowledge
-- Understand the building blocks of of creating a connected environment (Internet of Things, IoT)
-- Understand the various actors participating in our digitally connected environment
-- Understand the context of IoT through work that has gone before and Living Lab environments
-
-Prototyping Skills
-- Create a simple Arduino sketch with a sensor input and / or actuator output
-- Connect an Arduino based IoT device to a datastore to collect data over a wireless network
-- Sketch, photograph and use rapid prototyping to explore ideas
-
-Collaboration
-- Provide peer feedback to fellow students on project work (a “learn, build, critique” approach will be used throughout the course)
-- Create and present design decisions and prototypes to receive critical feedback
-- Document and share project information to support reproducible research
-
-In addition, you will establish a shared ‘connected environment’ that you will curate throughout the programme.
+All other legacy workshop folders (e.g., *blinking monster*, *plant monitor*) were removed to streamline the repository and focus on current, relevant coursework.
 
 
-## Software
 
-The course will make heavy use of the following software packages
+## Academic Integrity & Copyright Statement
 
-- **Arduino** Download and install the [Arduino IDE](https://www.arduino.cc/en/main/software) Click the `JUST DOWNLOAD` link to the left of the `CONTRIBUTE & DOWNLOAD` button. Once downloaded follow the instructions to install.
-  
-- **GitHub** Create an account on [GitHub](https://github.com) if you don't already have one.
+This repository is maintained solely for **educational and assessment purposes** as part of the **CASA0014: Connected Environments** module at **University College London (UCL)**.
 
-- **Git client.** If you are comfortable using Git on the command line then go for it. If you prefer a GUI representation then download a git client to make your life easier. 
-    - We use [Tower](https://www.git-tower.com/) which has a [free version for students](https://www.git-tower.com/students/mac). 
-    - We also hear good things about [SourceTree](https://www.sourcetreeapp.com) 
-    - and there are a few other open source [GUI Clients here](https://git-scm.com/download/gui/windows)
+- The **original materials** in this repository were developed and published by **UCL CASA** and remain under their respective open-source or teaching licenses.
+- All **newly created content** (including Arduino code, wiring documentation, images, and explanations in `Zihang_He_Piano/`) are **my original work**, authored by *Zihang He*.
+- Any reference to UCL teaching materials is used **only for coursework submission** and **non-commercial educational use** in accordance with UCL’s academic policies.
+- This repository does **not redistribute**, **resell**, or **claim ownership** over UCL’s original materials.
 
-
-## Main Module Information
-
-All the week by week information is over on [Moodle](https://moodle.ucl.ac.uk/course/view.php?id=45126)
+By submitting and publishing this work, I confirm that it complies with UCL’s **Academic Integrity and Plagiarism Policy**, and that all external materials are properly acknowledged and used within fair academic and educational use.
