@@ -56,4 +56,5 @@ This repository is maintained solely for **educational and assessment purposes**
 - Any reference to UCL teaching materials is used **only for coursework submission** and **non-commercial educational use** in accordance with UCL’s academic policies.
 - This repository does **not redistribute**, **resell**, or **claim ownership** over UCL’s original materials.
 
-By submitting and publishing this work, I confirm that it complies with UCL’s **Academic Integrity and Plagiarism Policy**, and that all external materials are properly acknowledged and used within fair academic and educational use.
+By submitting and publishing this work, I confirm that it complies with UCL’s **Academic Integrity and Plagiarism Policy**, and that all external materials are properly acknowledged and used within fair academic and educational use. 
+
