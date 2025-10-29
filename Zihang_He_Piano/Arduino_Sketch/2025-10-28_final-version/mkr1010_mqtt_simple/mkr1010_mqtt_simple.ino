@@ -7,7 +7,7 @@
 #include <utility/wifi_drv.h>
 #include <math.h>
 
-/* ==================== 先定义效果类型（避免顺序问题） ==================== */
+/* ==================== Effect Types ==================== */
 typedef uint8_t EffectType;
 static const EffectType E_NONE    = 0;
 static const EffectType E_RIPPLE  = 1;
@@ -30,19 +30,19 @@ String lightId    = "12";
 String mqtt_topic = "student/CASA0014/luminaire/" + lightId;
 String clientId   = "";
 
-// 在 connections.ino 中实现
+// Implemented in connections.ino
 void startWifi();
 void reconnectMQTT();
 void callback(char* topic, byte* payload, unsigned int length);
 
-/* ==================== 72 灯 payload ==================== */
+/* ==================== LED Payload (72 LEDs) ==================== */
 const int num_leds     = 72;
 const int payload_size = num_leds * 3;
 byte RGBpayload[payload_size];
-static uint8_t sparkBuf[payload_size] = {0};   // Sparkle 逐帧衰减缓冲
+static uint8_t sparkBuf[payload_size] = {0};   // Sparkle decay buffer
 
-/* ==================== 8 个按钮 ==================== */
-const uint8_t buttonPins[8] = {1,2,3,4,5,6,7,8};  // 如不稳可改 {2..9}
+/* ==================== 8 Buttons ==================== */
+const uint8_t buttonPins[8] = {1,2,3,4,5,6,7,8};  // If unstable, try {2..9}
 #define USE_NO 1
 #if USE_NO
 const int ACTIVE_LEVEL = LOW;
@@ -53,18 +53,18 @@ int lastLevel[8];
 unsigned long lastDebounceMs[8] = {0};
 const unsigned long DEBOUNCE_MS = 25;
 
-/* ==================== 每组9灯独立色相 ==================== */
+/* ==================== Hue per 9-LED Group ==================== */
 int   hues[8]  = {0,0,0,0,0,0,0,0};
 const int   HUE_STEP = 45;
 const float SAT = 1.0f;
 const float VAL = 0.9f;
 
-/* ==================== 蜂鸣器 ==================== */
-const uint8_t pianoBuzzerPin = 9; // 钢琴被动蜂鸣器
+/* ==================== Buzzers ==================== */
+const uint8_t pianoBuzzerPin = 9; // Piano passive buzzer
 bool pianoBuzzActive = false;
 unsigned long pianoBuzzOffAt = 0;
 
-const uint8_t metroBuzzerPin = 0; // 节拍器被动蜂鸣器（注意 D0/D1 可能是串口）
+const uint8_t metroBuzzerPin = 0; // Metronome passive buzzer (note D0/D1 may be serial)
 bool metroBuzzActive = false;
 unsigned long metroBuzzOffAt = 0;
 
@@ -107,9 +107,9 @@ namespace JHD1313M1 {
     }
   }
 }
-namespace JHD1313M1 { void setRGB_fix(){} } // 占位避免重复定义
+namespace JHD1313M1 { void setRGB_fix(){} } // Placeholder to avoid redefinition
 
-/* ==================== 工具函数 ==================== */
+/* ==================== Utilities ==================== */
 void hsvToRgb(float h, float s, float v, uint8_t& r, uint8_t& g, uint8_t& b) {
   float c = v * s;
   float x = c * (1 - fabs(fmod(h / 60.0, 2) - 1));
@@ -162,9 +162,9 @@ void set_all_rgb(uint8_t r, uint8_t g, uint8_t b) {
   mqttClient.publish(mqtt_topic.c_str(), RGBpayload, payload_size);
 }
 
-/* ==================== 模式与滑动电位器 ==================== */
-const uint8_t modeSwitchPin = 10;  // 拨到 I=LOW, 拨到 O=HIGH
-const int potPin = A0;             // 滑动电位器
+/* ==================== Mode & Potentiometer ==================== */
+const uint8_t modeSwitchPin = 10;  // I = LOW, O = HIGH
+const int potPin = A0;
 
 int lastModeLevel = HIGH;
 unsigned long lastModeDebounce = 0;
@@ -193,7 +193,7 @@ int readStableBpm() {
   return bpmShown;
 }
 
-/* ==================== 动画效果引擎（O 模式） ==================== */
+/* ==================== Animation Engine (Performance Mode) ==================== */
 struct EffectState {
   EffectType type = E_NONE;
   uint8_t    button = 0;
@@ -202,11 +202,11 @@ struct EffectState {
   unsigned long startMs = 0;
   unsigned long lastFrameMs = 0;
   bool       active = false;
-  float      speed = 0.0f;   // 像素/秒
-  float      width = 0.0f;   // 波宽/尾长
+  float      speed = 0.0f;   // px/s
+  float      width = 0.0f;   // band/length
 };
-EffectState fx;                              // 简化：一次只跑一个效果
-const unsigned long FX_FRAME_MS = 33;        // ~30fps
+EffectState fx;                              // Single running effect
+const unsigned long FX_FRAME_MS = 33;        // ~30 FPS
 
 inline void payloadClear() { memset(RGBpayload, 0, payload_size); }
 inline void payloadAddRGB(int p, uint8_t r, uint8_t g, uint8_t b) {
@@ -216,7 +216,7 @@ inline void payloadAddRGB(int p, uint8_t r, uint8_t g, uint8_t b) {
   RGBpayload[idx+1] = (uint8_t)min(255, RGBpayload[idx+1] + g);
   RGBpayload[idx+2] = (uint8_t)min(255, RGBpayload[idx+2] + b);
 }
-int groupCenterFromButton(uint8_t btn) { return btn*9 + 4; } // 每组9灯的中心像素
+int groupCenterFromButton(uint8_t btn) { return btn*9 + 4; } // Center of the 9-LED group
 EffectType effectForButton(uint8_t btn) {
   switch (btn % 4) {
     case 0: return E_RIPPLE;
@@ -252,7 +252,7 @@ void renderEffects() {
   if (fx.lastFrameMs && (now - fx.lastFrameMs) < FX_FRAME_MS) return;
   fx.lastFrameMs = now;
 
-  float t = (now - fx.startMs) / 1000.0f;   // 秒
+  float t = (now - fx.startMs) / 1000.0f;
   uint8_t baseR, baseG, baseB;
   hsvToRgb((float)fx.hue, SAT, VAL, baseR, baseG, baseB);
 
@@ -271,7 +271,7 @@ void renderEffects() {
       float radius = fx.speed * t;
       for (int p = 0; p < num_leds; ++p) {
         float d = fabsf(p - fx.originPixel);
-        float band = 1.0f - fabsf(d - radius) / fx.width; // 离“圈心”越近越亮
+        float band = 1.0f - fabsf(d - radius) / fx.width;
         addWithGain(p, max(0.0f, band));
       }
       if (t > 2.0f) fx.active = false;
@@ -308,8 +308,8 @@ void renderEffects() {
       float front = fx.speed * t;
       for (int p = 0; p < num_leds; ++p) {
         float d = fabsf(p - fx.originPixel);
-        float leadGain  = 1.0f - (d - front)/fx.width;                       // 前沿
-        float trailGain = expf(-max(0.0f, front - d)/ (fx.width*0.7f));      // 身后衰减
+        float leadGain  = 1.0f - (d - front)/fx.width;
+        float trailGain = expf(-max(0.0f, front - d)/ (fx.width*0.7f));
         float gain = max(0.0f, min(1.0f, max(leadGain, 0.0f) + 0.3f*trailGain));
         addWithGain(p, gain);
       }
@@ -322,7 +322,7 @@ void renderEffects() {
   mqttClient.publish(mqtt_topic.c_str(), RGBpayload, payload_size);
 }
 
-/* ==================== setup / loop ==================== */
+/* ==================== Setup / Loop ==================== */
 void setup() {
   Serial.begin(115200);
 
@@ -340,7 +340,7 @@ void setup() {
   analogReadResolution(12);          // 0..4095
   analogReference(AR_DEFAULT);       // 3.3V
 
-  randomSeed(analogRead(A1));        // Sparkle 随机
+  randomSeed(analogRead(A1));        // Sparkle randomness
 
   JHD1313M1::init();
   JHD1313M1::printLine(0, "Ready");
@@ -361,26 +361,26 @@ void loop() {
 
   unsigned long now = millis();
 
-  // 模式检测
+  // Mode detection (debounced)
   static int lastModeLevelLocal = HIGH;
   static unsigned long lastModeDebounceLocal = 0;
   int modeLevel = digitalRead(modeSwitchPin);
   if (modeLevel != lastModeLevelLocal && (now - lastModeDebounceLocal) > MODE_DEBOUNCE_MS) {
     lastModeDebounceLocal = now;
     lastModeLevelLocal = modeLevel;
-    if (modeLevel == LOW) { // 切到 I 模式
+    if (modeLevel == LOW) { // Switch to metronome
       nextBeatAt = 0; beatInBar = 0; fx.active = false;
     }
   }
 
-  // 钢琴系统（总是工作：蜂鸣 + LCD；O 模式触发动画）
+  // Piano system (always active: buzzer + LCD; effects only in Performance mode)
   for (uint8_t i = 0; i < 8; ++i) {
     int level = digitalRead(buttonPins[i]);
     if (level != lastLevel[i] && (now - lastDebounceMs[i]) > DEBOUNCE_MS) {
       lastDebounceMs[i] = now;
 
       if (level == ACTIVE_LEVEL && lastLevel[i] != ACTIVE_LEVEL) {
-        // 蜂鸣
+        // Sound
         pianoBeepStart(notesHz[i], 120);
 
         // LCD
@@ -392,17 +392,17 @@ void loop() {
         hsvToRgb((float)hues[i], SAT, VAL, r, g, b);
         JHD1313M1::setRGB(r/2, g/2, b/2);
 
-        // O 模式触发动画（取代“点亮9颗”）
+        // Start visual effect in Performance mode
         if (modeLevel == HIGH) {
           startEffect(i);
-          hues[i] = (hues[i] + HUE_STEP) % 360;   // 每次按下推进该键色相
+          hues[i] = (hues[i] + HUE_STEP) % 360;   // Advance hue per key press
         }
       }
       lastLevel[i] = level;
     }
   }
 
-  // I 模式：节拍器逻辑
+  // Metronome mode (modeLevel == LOW)
   if (modeLevel == LOW) {
     bpm = readStableBpm();
     beatInterval = 60000UL / bpm;
@@ -425,10 +425,10 @@ void loop() {
       JHD1313M1::printLine(1, bpmLine);
     }
   } else {
-    // O 模式：持续驱动动画帧
+    // Performance mode: animate effects
     renderEffects();
   }
 
-  // 关蜂鸣器
+  // Turn off buzzers when their timers expire
   buzzerTask();
 }
