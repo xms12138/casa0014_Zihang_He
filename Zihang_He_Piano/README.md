@@ -1,4 +1,6 @@
-# My Piano + Metronome MQTT LED Control System
+# SmartRhythm
+
+## My Piano + Metronome MQTT LED Control System
 
 *An individual IoT project for CASA0014: Connected Environments at UCL*
 
