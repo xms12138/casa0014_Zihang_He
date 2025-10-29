@@ -8,6 +8,16 @@
 
 This project combines **music interaction** with **IoT communication**, allowing users to play piano keys and visualize sound and rhythm through a **72-LED luminaire** connected via **MQTT**. Users can switch between practice mode and performance mode to help themselves improve their piano skills.
 
+Here are some links:
+
+[Photos taken during the production process](https://github.com/xms12138/casa0014_Zihang_He/tree/main/Zihang_He_Piano/Images)
+
+[Basic code for connecting to the MQTT server](https://github.com/xms12138/casa0014_Zihang_He/tree/main/Zihang_He_Piano/Arduino_Sketch/2025-10-15_base_connect_code)
+
+[Required hardware and connection methods](https://github.com/xms12138/casa0014_Zihang_He/tree/main/Zihang_He_Piano/Hardware_Components)
+
+[Relevant code related to Vespera](https://github.com/xms12138/casa0014_Zihang_He/tree/main/vespera)
+
 It was developed as part of the **CASA0014: Connected Environments** module at **University College London (UCL)**, which focuses on understanding and building connected IoT systems for people and the environment.
 
 The system uses an **Arduino MKR WiFi 1010**, **Grove LCD display**, **8 mechanical piano keys**, a **slider potentiometer**, and a **state machine switch** to switch between *Performance* and *Metronome* modes.
@@ -16,7 +26,9 @@ The system uses an **Arduino MKR WiFi 1010**, **Grove LCD display**, **8 mechani
 
 ------
 
-## 🎓 Background & Motivation
+
+
+## Background & Motivation
 
 The idea behind this project was to explore how **physical interaction (music performance)** could be connected to **digital visualization and feedback** through IoT.
  By mapping piano key inputs to LED color patterns and synchronizing rhythm through MQTT, the project demonstrates an **end-to-end IoT pipeline** — from local sensing and actuation to network communication and visualization.
@@ -25,37 +37,7 @@ This aligns with CASA0014’s aims to teach prototyping, communication, and envi
 
 ------
 
-## ⚙️ System Architecture
 
-```
-+---------------------------+
-| Piano Keys (8 switches)   |
-| Slider (BPM control)      |
-| Mode Switch (2 modes)     |
-+-------------+-------------+
-              |
-              v
-+----------------------------------+
-| Arduino MKR WiFi 1010            |
-|  - Reads piano keys & slider     |
-|  - Controls LCD & buzzer         |
-|  - Publishes data via MQTT       |
-+----------------------------------+
-              |
-              v
-+----------------------------------+
-| MQTT Broker (mqtt.cetools.org)   |
-| Topic: student/CASA0014/luminaire/<ID> |
-+----------------------------------+
-              |
-              v
-+----------------------------------+
-| LED Luminaire (72 NeoPixels)     |
-| Visual feedback of notes & BPM   |
-+----------------------------------+
-```
-
-------
 
 ## 🧱 Hardware Components
 
