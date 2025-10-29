@@ -6,7 +6,7 @@
 
 This repository is a **fork** of the original [ucl-casa-ce/casa0014](https://github.com/ucl-casa-ce/casa0014) repository for the UCL module **CASA0014 – Connected Environments**.
 
-For the introduction of my personal piano-making project, please refer to here: aaa
+For the introduction of my personal piano-making project, please refer to here: [Zihang_He_Piano](https://github.com/xms12138/casa0014_Zihang_He/tree/main/Zihang_He_Piano)
 
 
 
