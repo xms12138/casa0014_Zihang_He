@@ -12,7 +12,7 @@ It was developed as part of the **CASA0014: Connected Environments** module at *
 
 The system uses an **Arduino MKR WiFi 1010**, **Grove LCD display**, **8 mechanical piano keys**, a **slider potentiometer**, and a **state machine switch** to switch between *Performance* and *Metronome* modes.
 
-![](https://github.com/xms12138/casa0014_Zihang_He/blob/main/Zihang_He_Piano/Images/Final/exterior.jpg)
+![](F:\UCL\IOT\Git_Local\casa0014_Zihang_He\Zihang_He_Piano\Images\Final\exterior.jpg)
 
 ------
 
