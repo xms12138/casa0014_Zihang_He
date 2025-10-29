@@ -1,15 +1,18 @@
-# 🎹 Piano + Metronome MQTT LED Control System
+# Piano + Metronome MQTT LED Control System
 
 *An individual IoT project for CASA0014: Connected Environments at UCL*
 
 ------
 
-## 🧭 Overview
+## Overview
 
-This project combines **music interaction** with **IoT communication**, allowing users to play piano keys and visualize sound and rhythm through a **72-LED luminaire** connected via **MQTT**.
- It was developed as part of the **CASA0014: Connected Environments** module at **University College London (UCL)**, which focuses on understanding and building connected IoT systems for people and the environment.
+This project combines **music interaction** with **IoT communication**, allowing users to play piano keys and visualize sound and rhythm through a **72-LED luminaire** connected via **MQTT**. Users can switch between practice mode and performance mode to help themselves improve their piano skills.
+
+It was developed as part of the **CASA0014: Connected Environments** module at **University College London (UCL)**, which focuses on understanding and building connected IoT systems for people and the environment.
 
 The system uses an **Arduino MKR WiFi 1010**, **Grove LCD display**, **8 mechanical piano keys**, a **slider potentiometer**, and a **state machine switch** to switch between *Performance* and *Metronome* modes.
+
+![](https://github.com/xms12138/casa0014_Zihang_He/blob/main/Zihang_He_Piano/Images/Final/exterior.jpg)
 
 ------
 
